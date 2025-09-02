@@ -39,3 +39,7 @@ logs/*
 
 # Git files
 .git/*
+
+# emacs
+*~
+
