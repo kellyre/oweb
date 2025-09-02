@@ -87,6 +87,28 @@ def ask_question(question, model, knowledge_ids=None):
         print(f"Failed to get response: {response.status_code}")
         print(response.text)
 
+def load_directory(directory_path):
+    """Load all MD files from a directory and its subdirectories."""
+    if not os.path.isdir(directory_path):
+        print(f"Error: {directory_path} is not a valid directory")
+        return
+    
+    md_files = []
+    for root, dirs, files in os.walk(directory_path):
+        for file in files:
+            if file.lower().endswith('.md'):
+                md_files.append(os.path.join(root, file))
+    
+    if not md_files:
+        print(f"No .md files found in {directory_path}")
+        return
+    
+    print(f"Found {len(md_files)} .md files. Uploading...")
+    
+    for file_path in md_files:
+        print(f"Uploading: {file_path}")
+        upload_knowledge(file_path)
+
 def main():
     parser = argparse.ArgumentParser(description="Open WebUI CLI Tool")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -94,6 +116,10 @@ def main():
     # Upload command
     upload_parser = subparsers.add_parser("upload", help="Upload a knowledge document")
     upload_parser.add_argument("file", help="Path to the document")
+
+    # Load directory command
+    load_dir_parser = subparsers.add_parser("load-dir", help="Load all MD files from a directory and subdirectories")
+    load_dir_parser.add_argument("directory", help="Path to the directory")
 
     # List knowledge documents command
     subparsers.add_parser("list-knowledge", help="List all loaded knowledge documents")
@@ -111,6 +137,8 @@ def main():
 
     if args.command == "upload":
         upload_knowledge(args.file)
+    elif args.command == "load-dir":
+        load_directory(args.directory)
     elif args.command == "list-knowledge":
         list_knowledge()
     elif args.command == "list-models":
